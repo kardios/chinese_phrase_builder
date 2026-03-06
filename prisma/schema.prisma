@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model VocabularyEntry {
+  id              String        @id @default(cuid())
+  englishWord     String
+  partOfSpeech    String?
+  topicTag        String?
+  difficultyLevel String?
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  savedPhrases    SavedPhrase[]
+}
+
+model SavedPhrase {
+  id                 String          @id @default(cuid())
+  vocabularyEntryId  String
+  chineseText        String
+  pinyin             String
+  englishTranslation String
+  usageNote          String?
+  familiarityRating  Int             @default(0)
+  isFavorite         Boolean         @default(false)
+  lastReviewedAt     DateTime?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  vocabularyEntry    VocabularyEntry @relation(fields: [vocabularyEntryId], references: [id], onDelete: Cascade)
+
+  @@index([vocabularyEntryId])
+}
