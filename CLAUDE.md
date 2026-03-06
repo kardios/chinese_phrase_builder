@@ -66,14 +66,17 @@ Cascade delete: deleting a vocabulary entry removes all its saved phrases.
 
 - All pages are client components (`"use client"`)
 - API routes validate input with Zod schemas from `src/lib/validators.ts`
+- API routes wrap `request.json()` in try/catch to return 400 on invalid JSON
+- Shared types (`PhraseType`, `VocabEntry`) are defined once in `src/lib/validators.ts` and imported everywhere
 - Prisma client is a singleton via `src/lib/db.ts` to avoid connection leaks in dev
+- Prisma datasource URL uses `env("DATABASE_URL")` — set in `.env` (gitignored)
 - Environment variables: `DATABASE_URL`, `ANTHROPIC_API_KEY` (in `.env`, gitignored)
+- Navigation uses Next.js `<Link>` for client-side transitions
+- Phrase generation uses `generateObject` from the AI SDK (structured output, no manual JSON parsing)
+- Vocabulary POST endpoint deduplicates by `englishWord` — returns existing entry if found
 - ESM project (`"type": "module"` in package.json)
+- Anthropic API does not support `minItems`/`maxItems` in JSON schemas — avoid these on schemas passed to `generateObject`
 
 ## Known Issues
 
-- Generating phrases always creates a new VocabularyEntry (no dedup by word)
-- Phrases API `isFavorite` filter has a bug — applied even when param not passed
-- Navigation uses `<a>` tags instead of Next.js `<Link>` (causes full reloads)
 - No debounce on search inputs
-- `PhraseType` is duplicated across multiple files
